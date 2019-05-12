@@ -15,7 +15,7 @@ public class Image {
         case horizontal, vertical, both
     }
 
-    private var internalImage: gdImagePtr
+    public var internalImage: gdImagePtr
 
     public var size: Size {
         return Size(width: internalImage.pointee.sx, height: internalImage.pointee.sy)
@@ -236,6 +236,26 @@ extension Image {
         guard let image = loadedImage else { return nil }
         self.init(gdImage: image)
     }
+    public func cropImage(x:Int,y:Int,width:Int,height:Int) -> Image? {
+        
+        var crop = gdRect(x: Int32(x), y: Int32(y), width: Int32(width), height: Int32(height))
+        
+        guard let output = gdImageCrop(internalImage,&crop) else { return nil }
+        return Image(gdImage: output)
+        
+    }
+    
+    public func imageCopy(src:gdImagePtr,srcX:Int,srcY:Int,destWidth:Int,destHeight:Int) {
+        gdImageCopy (internalImage,
+                     src,
+                     Int32(srcX),
+                     Int32(Int(internalImage.pointee.sy) - srcY - destHeight),
+                     Int32(0),
+                     Int32(0),
+                     Int32(destWidth),
+                     Int32(destHeight))
+        
+    }
 
     @discardableResult
     public func write(to url: URL, quality: Int = 100, allowOverwrite: Bool = false) -> Bool {
@@ -288,3 +308,4 @@ extension Image {
         return try format.data(of: internalImage)
     }
 }
+
