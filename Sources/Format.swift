@@ -210,13 +210,7 @@ private struct WBMPFormatter: LibGdParametrizableFormatter {
 }
 
 /// Defines a formatter to be used on WEBP import & export conversions
-private struct WEBPFormatter: LibGdFormatter {
-    /// Function pointer to libgd's built-in webp image create function
-    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
 
-    /// Function pointer to libgd's built-in webp image export function
-    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
-}
 
 // MARK: - Convenience LibGd Format
 
@@ -239,7 +233,6 @@ public enum ImportableFormat: ImportableFormatter {
     case tiff
     case tga
     case wbmp
-    case webp
     case any // Wildcard, will evaluate all of the above defined cases
 
     /// Creates a `gdImagePtr` from given image data.
@@ -256,10 +249,9 @@ public enum ImportableFormat: ImportableFormatter {
         case .tiff: return try TIFFFormatter().imagePtr(of: data)
         case .tga: return try TGAFormatter().imagePtr(of: data)
         case .wbmp: return try WBMPFormatter(index: -1).imagePtr(of: data)
-        case .webp: return try WEBPFormatter().imagePtr(of: data)
         case .any:
             return try ([
-                .jpg, .png, .gif, .webp, .tiff, .bmp, .wbmp
+                .jpg, .png, .gif, .tiff, .bmp, .wbmp
                 ] as [ImportableFormat]).imagePtr(of: data)
         }
     }
@@ -282,7 +274,6 @@ public enum ExportableFormat: ExportableFormatter {
     case png
     case tiff
     case wbmp(index: Int32)
-    case webp
 
     /// Creates a data representation of given `gdImagePtr`.
     ///
@@ -301,7 +292,6 @@ public enum ExportableFormat: ExportableFormatter {
         case .gif: return try GIFFormatter().data(of: imagePtr)
         case .png: return try PNGFormatter().data(of: imagePtr)
         case .tiff: return try TIFFFormatter().data(of: imagePtr)
-        case .webp: return try WEBPFormatter().data(of: imagePtr)
         }
     }
 }
